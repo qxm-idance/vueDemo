@@ -1,0 +1,179 @@
+html,
+body {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+body,
+.page {
+  background-color: #f5f5f9;
+}
+.container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+}
+.page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.ui-middle {
+  position: absolute;
+  left: 50%;
+  width:100%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+.ui-center {
+  margin-left: 50%;
+  transform: translate(-50%, 0);
+  -webkit-transform: translate(-50%, 0);
+}
+h1 {
+  font-size: 1.125rem;
+  font-weight: 400;
+  text-align: center;
+  line-height: 2.75rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 5;
+}
+.ui-content {
+  position: absolute;
+  top: 2.75rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 19;
+  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.help .ui_grid {
+  background-color: #fff;
+}
+.help .ui_grid:before {
+  top: 1rem;
+  height: 2.1rem;
+}
+.ui_cells_title {
+  margin-top: 1.5rem;
+}
+.am-list:not([am-version]) .am-list-header {
+  font-size: 0.95rem;
+  padding-top: 1rem;
+}
+/* index.vue */
+.help .ui-content {
+  bottom: 2.8rem;
+}
+.help .help_grid_hd {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background-color: #fff;
+}
+.help .help_grid_hd:before {
+  top: 0;
+  height: 100%;
+}
+.ui_grids0:before {
+  z-index: 20;
+}
+.help_grids .help_grid_hd {
+  width: 25%;
+}
+.help_grids .help_grid_bd {
+  margin-left: 25%;
+  width: 75%;
+  padding: 0;
+  background-color: #fff;
+}
+.help_grids .ui_grid:active {
+  background-color: #fff;
+}
+.help .am-list {
+  padding: 0;
+}
+.help_grid_hd .ui_grid_icon + .ui_grid_label {
+  margin-top: 0.4rem;
+}
+.am-list .am-list-item:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 100%;
+  height: 1px;
+  border-top: 1px solid #e5e5e5;
+  /*-webkit-transform: scaleY(0.5);
+  transform: scaleY(0.5);*/
+}
+.am-list .am-list-item:after {
+  content: " ";
+  position: absolute;
+  left: 0;
+  bottom: 0px;
+  width: 100%;
+  height: 1px;
+  border-bottom: 1px solid #e5e5e5;
+  /*-webkit-transform: scaleY(0.5);
+  transform: scaleY(0.5);*/
+}
+.ui-list-item {
+  padding: .4rem .9375rem;
+  min-height: 2rem;
+  text-align: left;
+  color: #555;
+  font-size: .875rem;
+  position: relative;
+}
+.ui-list-item:active {
+  background-color: #E4E4E4;
+}
+.ui-list-item:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  border-bottom: 1px solid #e5e5e5;
+}
+.ui-list-item .ui-list-content {
+  line-height: 2rem;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  width: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+/*list.vue*/
+.help-list .weui_grid {
+  height: 4.5rem;
+  width: 50%;
+  background-color: #fff;
+}
+.help-list .weui_grid_label {
+  font-size: 0.95rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  color: #666;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+}
+

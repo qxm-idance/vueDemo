@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no"/>
+    <title>帮助中心</title>
+    <script>
+        function PGCallback(callbackId, args) {
+
+        	if (callbackId == 'onBackKeyPress') {
+        		if (typeof PG.onBackKeyPress === 'function') PG.onBackKeyPress();
+        	}
+        	else
+        		PG.callback(callbackId, args);
+        }
+
+        var PG = {
+        	jv: '1.0',
+        	bridge: null,
+        	callbackId: 0,
+        	callbacks: [],
+        	commandQueue: [],
+        	platid: (navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Linux') > -1) ? '2' : '1',
+
+        	platform: (navigator.userAgent.indexOf('Android') > -1 || navigator.userAgent.indexOf('Linux') > -1) ? 'android' : 'ios',
+
+        	commandQueueFlushing: false,
+        	getAndClearQueuedCommands: function () {
+        		var json = JSON.stringify(this.commandQueue);
+        		this.commandQueue = [];
+        		return json;
+        	},
+
+        	exec: function (method, callback, args) {
+        		//if (!PG.Device.App) return;
+        		if (callback === undefined)
+        			callback = null;
+        		if (args === undefined || args == null || typeof (args) != 'object')
+        			args = {};
+        		var callbackId = '';
+
+        		if (callback && typeof (callback) == 'function') {
+
+        			callbackId = method + PG.callbackId++;
+
+        			PG.callbacks[callbackId] = callback;
+
+        		}
+
+        		var obj = {
+
+        			Method: method,
+
+        			CallbackId: callbackId,
+
+        			Args: args
+
+        		}
+        		if (this.platform == 'ios') {
+        			if (this.bridge == null) {
+        				this.bridge = document.createElement("iframe");
+        				this.bridge.setAttribute("style", "display:none;");
+        				this.bridge.setAttribute("height", "0px");
+        				this.bridge.setAttribute("width", "0px");
+        				this.bridge.setAttribute("frameborder", "0");
+        				document.documentElement.appendChild(this.bridge);
+        			}
+
+        			this.commandQueue.push(JSON.stringify(obj));
+        			if (!this.commandQueueFlushing) {
+        				this.bridge.src = 'pg://ready';
+        			}
+        		}
+        		else
+        			if (this.platform == 'wp8')
+        				window.external.notify('pg://' + encodeURIComponent(JSON.stringify(obj)));
+        			else
+        				if (window.comjs) {
+        					window.comjs.notify('pg://' + encodeURIComponent(JSON.stringify(obj)));
+        				}
+
+        	},
+
+        	callback: function (callbackId, args) {
+
+        		if (PG.callbacks[callbackId]) {
+
+        			try {
+
+        				if (PG.callbacks[callbackId]) {
+
+        					var temp = decodeURIComponent(args);
+
+        					var obj = JSON.parse(temp);
+
+        					PG.callbacks[callbackId](obj);
+
+        				}
+
+        			}
+
+        			catch (e) {
+
+        				console.log("Error in success callback: " + callbackId + " = " + e);
+
+        			}
+
+
+
+        			delete PG.callbacks[callbackId];
+
+        		}
+
+        	},
+
+        	onBackKeyPress: function ()//点击回退按钮时的事件 返回true不退出，返回false退出
+        	{
+        		return false;
+        	},
+        	onShakePhone: function ()//摇一摇手机促发该事件
+        	{
+
+        	},
+
+        	onEnterForeground: function ()//程序重新获取焦点
+        	{
+
+        	},
+        	onEnterBackground: function ()//程序失去获取焦点
+        	{
+
+        	},
+
+        	onWebviewPresent: function ()//webView显示时触发
+        	{
+
+        	},
+        	onWebviewDismiss: function ()//webView消失时触发
+        	{
+
+        	}
+        }
+
+        if (navigator.userAgent.indexOf('Windows Phone 8.') > 0) PG.platform = 'wp8';
+
+        //隐藏加载菊花图
+        PG.hideDefaultImage = function () {
+        	this.exec("hideDefaultImage", null, null);
+        }
+        //显示加载菊花图
+        PG.showDefaultImage = function () {
+        	this.exec("showDefaultImage", null, null);
+        }
+
+        //获取设备基本信息
+        PG.Device = (function () {
+        	var ua = navigator.userAgent;
+        	var url = document.location.href;
+
+        	var isChrome = ua.indexOf('Chrome') > -1,   //部分国产浏览器的极速模式也会判断为Chrome，暂不管
+        	isSafari = ua.indexOf('Safari') > -1 && !isChrome,
+        	isUC = ua.indexOf('UCBrowser') > -1,
+        	isAndroid = ua.indexOf('Android') > -1,
+        	isiPhone = ua.indexOf('iPhone') > -1,
+        	isIOS = !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
+        	isWinPhone = ua.indexOf('Windows Phone') > -1,
+        	isWP8 = ua.indexOf('Windows Phone 8.') > -1,
+        	isMoible = isAndroid || isIOS || isWinPhone,
+        	isAppUrl = (url.indexOf('appid=') > 0 || url.indexOf('app=') > 0) && url.indexOf('v=') > 0,
+        	isApp = (isMoible && isAppUrl) || (/Enniu/i.test(ua));
+
+        	var os = '';
+        	var plat = '';
+        	if (isMoible) {
+        		if (isIOS)
+        			os = 'ios';
+        		if (isAndroid)
+        			os = 'android';
+        		if (isWinPhone)
+        			os = 'wp';
+        		if (isWP8)
+        			os = 'wp8';
+        	}
+        	if (os.length > 0) {
+        		plat = os;
+        		if (os == 'ios') {
+        			if (ua.indexOf('iPad') > 0)
+        				plat = 'iPad';
+        			else
+        				if (ua.indexOf('iPhone') > 0)
+        					plat = 'iPhone';
+        		}
+        	}
+
+        	return {
+        		OS: os,
+        		Plat: plat,
+        		Android: isAndroid,
+        		iPhone: isiPhone,
+        		WinPhone: isWinPhone,
+        		Mobile: isMoible,
+        		App: isApp,
+        		AndroidApp: isAndroid && isAppUrl,
+        		IOSApp: isIOS && isAppUrl,
+                isIOS: isIOS,
+        		WinPhoneApp: isWinPhone && isAppUrl,
+        		WP8: isWinPhone && isAppUrl && ua.indexOf('Windows Phone 8.') > 0,
+        		webKit: ua.indexOf('AppleWebKit') > -1
+        	};
+        })();
+        /*获取设备高级信息
+        	返回示例：
+        	DeviceInfo:{
+        		"uuid":"3660E953-1469-4B6D-9A65-58A12D2FF2AC","macid":"68:96:7B:89:77:55",
+        		"system_version":"6.1.4","device_token":"","system_name":"iPhone OS","screen_width":320,
+        		"carrier":{"allow_voip":1,"carrier_name":"中国电信","mnc":"03","mcc":"460","icc":"cn"},
+        		"screen_height":568,"model":"iPhone"
+        	}
+         */
+        PG.getDeviceInfo = function (callback) {
+        	this.exec("getDeviceInfo", callback, null);
+        }
+
+        //打开app内部浏览器
+        PG.openWebView = function ( title, url , backtxt) {
+        	if(!url) alert('url不能为空');
+
+        	if (!PG.Device.App) {
+        		window.open(url);
+        		return;
+        	}
+
+        	var args = {
+        		url: url,
+        		title: title || '',
+        		backtxt: backtxt || ''
+        	};
+        	this.exec("openWebView", null, args);
+        };
+        PG.openUrl = function (url) {
+
+        	var args = {
+
+        		url: url
+
+        	};
+
+        	this.exec("openUrl", null, args);
+
+        };
+        PG.goUrl = function (url) {
+
+        	var args = {
+
+        		url: url
+
+        	};
+
+        	this.exec("goUrl", null, args);
+
+        }
+        PG.postNotification = function(bankId, peopleId, mobile) {
+        	var args = {
+        		data: {
+        			bank_id: bankId,
+        			people_id: peopleId,
+        			mobile: mobile
+        		},
+        		name: 'RenZheng'
+        	};
+
+        	this.exec('postNotification', null, args);
+        }
+        PG.openApp = function (url) {
+        	var args = {
+        		url: url
+        	};
+        	this.exec("openApp", null, args);
+        }
+        PG.openSelf = function () {
+        	var args = {
+        		url: url
+        	};
+        	this.exec("openSelf", null, args);
+        }
+
+        //销毁本页面的窗口载体
+        PG.exitApp = function () {
+        	this.exec("exitApp", null, null);
+        }
+        //可能是退出整个应用
+        PG.exitSelf = function () {
+        	this.exec("exitSelf", null, null);
+        }
+
+        /* 调起外部分享
+        	shareTo  :  friendCircle/weixin/weibo
+        	userObj  :
+        		微信/朋友圈=>{title:'标题',desc:'描述',pic:'图片地址',link:'活动链接'}
+        		微博=> {text:'微博内容',pic:'图片地址'}
+        */
+        PG.share = function (shareTo ,userObj, fn){
+        	var userObj = userObj || {};
+        	// 用于微信
+        	var weixinTitle = userObj["title"] || "",
+        	weixinDescription = userObj["desc"] || "",
+        	weixin_pic = userObj["pic"] || "",
+        	weixin_link = userObj["link"] || "";
+
+        	// 用于微博
+        	var weiboText = userObj["text"] || "",
+        	weibo_pic = userObj["pic"] || "";
+
+        	var shareData = {
+        		"friendCircle":{
+        			type: 2,
+        			scene: 1,
+        			title: weixinTitle,
+        			description: weixinDescription,
+        			thumb_path: weixin_pic,
+        			thumb_path_is_url: 1,
+        			web_page_url: weixin_link
+        		},
+        		"weixin":{
+        			type: 2,
+        			scene: 0,
+        			title: weixinTitle,
+        			description: weixinDescription,
+        			thumb_path: weixin_pic,
+        			thumb_path_is_url: 1,
+        			web_page_url: weixin_link
+        		},
+        		"weibo":{
+        			type: 1,
+        			text: weiboText ,
+        			image_path: weibo_pic,
+        			image_path_is_url: 1
+        		}
+        	};
+
+        	var shareAct = {
+        		"friendCircle":"tcWechatShared",
+        		"weixin":"tcWechatShared",
+        		"weibo":"tcWeiboShared"
+        	};
+
+        	if(typeof(shareAct[shareTo]) === "undefined"){
+        		var e = new Error();
+        		e.message = "sharePageAction函数第一个参数有误，不在可选范围内";
+        		throw e;
+        	}
+
+        	PG.exec(shareAct[shareTo], fn, shareData[shareTo]);
+        }
+        /* 掉起照相机
+        	fn : function(res){
+        		图片src => "data:image/" + res.Image.type + ";base64," + res.Image.base64
+        	}
+        	args : {width:200,height:200,quality:0-100}
+         */
+        PG.getPhoto = function (fn, args) {
+        	if (args === undefined) args = null;
+        	this.exec("getPhoto", fn, args);
+        }
+        /* 获取经纬度
+        	返回 data.Location 如 {"lat":123.12312313,"lon":23.923939}
+         */
+        PG.getLocation = function (fn) {
+        	if (PG.Device.App) {
+        		this.exec("getLocation", fn, null);
+        	} else {
+        		var data = {
+        			code: 0,
+        			msg: '',
+        			Location: {
+        				lat: 0,
+        				lon: 0
+        			}
+        		};
+        		if (navigator.geolocation) {
+        			navigator.geolocation.getCurrentPosition(function (pos) {
+        				data.Location = {
+        					lat: pos.coords.latitude,
+        					lon: pos.coords.longitude
+        				}
+        				fn(data);
+        			});
+        		} else {
+        			fn(data);
+        		}
+        	}
+        }
+
+        //下面用得比较少
+        PG.getPasteboard = function (callback) {
+        	this.exec("getPasteboard", callback, null);
+        }
+        PG.execJs = function (code) {
+
+        	var args = {
+
+        		code: code
+
+        	};
+
+        	this.exec("execJs", null, args);
+
+        }
+        PG.vibratePhone = function () {
+        	this.exec("vibratePhone", null, null);
+        }
+        PG.alert = function (msg, title, buttonName, fn) {
+        	if (!PG.Device.App) {
+        		alert(msg);
+        		if (typeof (fn) == 'function')
+        			fn(1);
+        		return;
+        	}
+        	if (title === undefined)
+        		title = '提示';
+        	if (buttonName === undefined)
+        		buttonName = '确定';
+        	if (fn === undefined) fn = null;
+        	var args = {
+        		title: title,
+        		msg: msg,
+        		buttons: buttonName
+        	};
+        	this.exec("alert", fn, args);
+        }
+        PG.confirm = function (msg, title, buttons, fn) {
+        	if (!PG.Device.App) {
+        		if (confirm(msg))
+        			if (typeof (fn) == 'function')
+        				fn(2);
+        		return;
+        	}
+        	if (title === undefined)
+        		title = '提示';
+        	if (buttons === undefined)
+        		buttons = '取消,确定';
+        	if (fn === undefined) fn = null;
+        	var args = {
+        		title: title,
+        		msg: msg,
+        		buttons: buttons
+        	};
+        	var enfn = function (data) {
+        		if (typeof (data) == 'object' && data.code == 0) {
+        			if (typeof (fn) == 'function')
+        				fn(data.index);
+        		}
+        	}
+        	this.exec("alert", enfn, args);
+        }
+        PG.umengEvt = function (event_name) {
+        	var args = {
+        		event_name: event_name
+        	};
+        	this.exec("umengEvt", null, args);
+        }
+        PG.umengAppUnion = function () {
+        	this.exec("umengAppUnion", null, null);
+        }
+
+        PG.setKeyValue = function (key, val, fn) {
+
+        	if (fn === undefined) fn = null;
+        	var args = {
+        		key: key,
+        		value: val
+        	};
+        	this.exec("setKeyValue", fn, args);
+        }
+        PG.getKeyValue = function (key, fn) {
+        	var args = {
+        		key: key
+        	};
+        	this.exec("getKeyValue", fn, args);
+        }
+        PG.removeKeyValue = function (key, fn) {
+        	if (fn === undefined) fn = null;
+        	var args = {
+        		key: key
+        	};
+        	this.exec("removeKeyValue", fn, args);
+        }
+        PG.cleanApplicationCache = function () {
+        	this.exec("cleanApplicationCache", null, null);
+        }
+
+        /* 下面是根据需求新增方法 */
+        //隐藏原生头部导航条（如果网页自定义头部时）
+        PG.hideNavbar = function(fn){
+        	PG.exec("hideNavigationBar", fn, null);
+        }
+
+        //是否支持苹果滚动
+        PG.setWebViewScrollLock = function(scl){
+            var args = {
+                lock: scl
+            }
+
+            if(PG.Device.OS === 'ios'){
+                this.exec('setWebViewScrollLock', null, args);
+            }
+        }
+
+        window.PGCallback = PGCallback;
+        window.PG = PG;
+
+    </script>
+    <script>
+        PG.setWebViewScrollLock(true);
+
+        if (PG.Device.Android) {
+            document.querySelector('html').className = 'android';
+            // PG.alert(document.querySelector('html').className);
+        }
+
+        // PG.showDefaultImage();
+    </script>
+    <script>
+        ;(function(win) {
+            var docEl = document.documentElement;
+            var metaEl = document.querySelector('meta[name="viewport"]');
+            var fontEl = document.createElement('style'), dpr,scale,tid;
+            if (metaEl) {
+                var match = metaEl.getAttribute('content').match(/initial\-scale=(["']?)([\d\.]+)\1?/);
+                if (match) {
+                    scale = parseFloat(match[2]);
+                    dpr = 1 / scale;
+                }
+            }
+            if (!dpr && !scale) {
+                //非ios dpr 统一为1
+                dpr = PG.Device.Android ? 1 : win.devicePixelRatio || 1
+                if (dpr > 2) dpr = 2;
+                scale = 1 / dpr;
+            }
+            // alert(scale);
+            docEl.setAttribute('data-dpr', dpr);
+            docEl.firstElementChild.appendChild(fontEl);
+            if (!metaEl) {
+                metaEl = document.createElement('meta');
+                metaEl.setAttribute('name', 'viewport');
+                var matches = navigator.userAgent.match(/Android[\S\s]+AppleWebkit\/(\d{3})/i);
+                var UCversion = navigator.userAgent.match(/U3\/((\d+|\.){5,})/i);
+
+                if(!matches || matches && matches[1] > 534 || UCversion && parseInt(UCversion[1].split('.').join(''),10) >= 80) {
+                    metaEl.setAttribute('content', 'width=device-width,user-scalable=no,initial-scale=' + scale + ',maximum-scale=' + scale + ', minimum-scale=' + scale);
+                    if (docEl.firstElementChild) {
+                        docEl.firstElementChild.appendChild(metaEl);
+                    } else {
+                        var wrap = document.createElement('div');
+                        wrap.appendChild(metaEl);
+                        document.write(wrap.innerHTML);
+                    }
+
+                    if(docEl.clientWidth == 980 || docEl.clientWidth == 1024) {
+                        metaEl.setAttribute('content', 'target-densitydpi=device-dpi,width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1');
+                    }
+                } else {
+                    metaEl.setAttribute('content', 'width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1');
+                    if (docEl.firstElementChild) {
+                        docEl.firstElementChild.appendChild(metaEl);
+                    } else {
+                        var wrap2 = document.createElement('div');
+                        wrap2.appendChild(metaEl);
+                        document.write(wrap2.innerHTML);
+                    }
+
+                    dpr = 1;
+                }
+            }
+
+            function setUnitA(){
+                win.rem = 16 * dpr;
+                fontEl.innerHTML = 'html{font-size:' + win.rem + 'px!important;}';
+            }
+            win.dpr = dpr;
+            setUnitA();
+        })(window);
+    </script>
+</head>
+<body>
+    <div id="main"></div>
+</body>
+</html>
