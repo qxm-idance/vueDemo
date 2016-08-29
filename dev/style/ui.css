@@ -101,3 +101,42 @@
   top: 0;
   z-index: 10;
 }
+
+.ui-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background-color: #fff;
+}
+.ui-footer img {
+  height: 1.1rem;
+  display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 3px;
+}
+.ui-footer span {
+  display: block;
+}
+.ui-footer .ui_grid_label {
+  margin-top: 0;
+  font-size: 0.75rem;
+  color: #777;
+}
+.ui-footer .ui_grid {
+  width: 33.333%;
+  height: 3rem;
+  padding: 0.4rem 0;
+  text-align: center;
+}
+.ui-footer .ui_grids:before {
+  z-index: 20;
+  border-top-color: #999;
+  -webkit-transform: scaleY(0.5);
+  transform: scaleY(0.5);
+}
+.ui-footer .ui_grid:before {
+  top: 1rem;
+  height: 1rem !important;
+}

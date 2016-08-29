@@ -1,25 +1,19 @@
 <template>
     <footer class="ui-footer">
-        <div class="weui_grids">
-
-            <!-- <a class="weui_grid js_grid" href="javascript:;" v-touch:tap="goForum()">
-                <div class="weui_grid_label">
-                    <img :src="img[1]"><span>51论坛</span>
-                </div>
-            </a> -->
-            <a class="weui_grid js_grid" href="javascript:;" v-touch:tap="goContact()">
-                <div class="weui_grid_label">
+        <div class="ui_grids">
+            <a class="ui_grid js_grid" href="javascript:;" v-touch:tap="goContact()">
+                <div class="ui_grid_label">
                     <img :src="img[2]">
                     <span>联系我们</span>
                 </div>
             </a>
-            <a class="weui_grid js_grid" href="javascript:;" v-touch:tap="goService()">
-                <div class="weui_grid_label">
+            <a class="ui_grid js_grid" href="javascript:;" v-touch:tap="goService()">
+                <div class="ui_grid_label">
                     <img :src="img[0]"><span>智能客服</span>
                 </div>
             </a>
-            <a class="weui_grid js_grid" href="javascript:;" v-touch:tap="goFeedback()">
-                <div class="weui_grid_label">
+            <a class="ui_grid js_grid" href="javascript:;" v-touch:tap="goFeedback()">
+                <div class="ui_grid_label">
                     <img :src="img[3]"><span>建议反馈</span>
                 </div>
             </a>
